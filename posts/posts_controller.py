@@ -2,8 +2,8 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query
 from sqlmodel import create_engine, SQLModel, Session, select
 
-from entities.post_entity import Post
-from dto.create_post_dto import CreatePostDto
+from posts.entities.post_entity import Post
+from posts.dto.create_post_dto import CreatePostDto
 from common.dto.pagination_dto import PaginationDto
 
 sqlite_file_name = 'blogging_platform.db'
