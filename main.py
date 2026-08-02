@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from posts_controller import posts_controller
+from posts.posts_controller import posts_controller
 
 app = FastAPI()
 
