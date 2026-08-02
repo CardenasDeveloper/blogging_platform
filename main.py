@@ -1,14 +1,10 @@
 from typing import Annotated
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Query
 from sqlmodel import SQLModel, Field, create_engine, Session, select
 
-# from dto.post_dto import PostDto
-
-class Post(SQLModel, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-    title: str
-    content: str
-    category: str
+from dto.create_post_dto import CreatePostDto
+from common.dto.pagination_dto import PaginationDto
+from entities.post_entity import Post
 
 sqlite_file_name = 'blogging_platform.db'
 sqlite_url = f'sqlite:///{sqlite_file_name}'
@@ -31,21 +27,20 @@ app = FastAPI()
 def on_startup():
     create_db_and_tables()
 
-@app.get('/')
-def getHello():
-    return 'Hello World'
-
-
-@app.post('/posts', status_code=201)
-def create_post(blog: Post, session: SessionDep):
-    session.add(blog)
+@app.post('/posts', status_code=201, response_model=Post)
+def create_post(create_post_dto: CreatePostDto, session: SessionDep):
+    post = Post(**create_post_dto.model_dump())
+    session.add(post)
     session.commit()
-    session.refresh(blog)
-    return blog
+    session.refresh(post)
+    return post
 
 @app.get('/posts')
-def find_all(session: SessionDep):
-    return session.exec(select(Post)).all()
+def find_all(session: SessionDep, pagination_dto: Annotated[PaginationDto, Query()]):
+    pagination_dict = pagination_dto.model_dump()
+    limit = pagination_dict['limit']
+    page = pagination_dict['page'] - 1
+    return session.exec(select(Post).offset(page * limit).limit(limit)).all()
 
 @app.get('/posts/{id}')
 def find_one_by_id(id: int, session: SessionDep):
