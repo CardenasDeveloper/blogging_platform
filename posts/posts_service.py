@@ -3,6 +3,7 @@ from fastapi import Depends, HTTPException
 from sqlmodel import SQLModel, Session, create_engine, select
 
 from posts.dto.create_post_dto import CreatePostDto
+from posts.dto.update_post_dto import UpdatePostDto
 from posts.entities.post_entity import Post
 from common.dto.pagination_dto import PaginationDto
 
@@ -43,6 +44,15 @@ class PostsService:
         post = self.session.get(Post, id)
         if not post:
             raise HTTPException(status_code=404, detail=f'The post with ID #{ id } not found')
+        return post
+
+    def update_post(self, id: int, update_post_dto: UpdatePostDto):
+        post = self.find_one_post(id)
+        post_data = update_post_dto.model_dump()
+        post.sqlmodel_update(post_data)
+        self.session.add(post)
+        self.session.commit()
+        self.session.refresh(post)
         return post
 
     def delete_post(self, id: int):
