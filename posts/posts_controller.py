@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, Query
 
 from posts.entities.post_entity import Post
 from posts.dto.create_post_dto import CreatePostDto
+from posts.dto.update_post_dto import UpdatePostDto
 from posts.posts_service import PostsService, create_db_and_tables
 from common.dto.pagination_dto import PaginationDto
 
@@ -26,7 +27,10 @@ def find_all(pagination_dto: Annotated[PaginationDto, Query()], postsService: An
 def find_one_post(id: int, postsService: Annotated[PostsService, Depends(PostsService)]):
     return postsService.find_one_post(id)
 
+@posts_controller.patch('/posts/{id}', response_model=Post)
+def update_post(id: int, update_post_dto: UpdatePostDto, postsService: Annotated[PostsService, Depends(PostsService)]):
+    return postsService.update_post(id, update_post_dto)
+
 @posts_controller.delete('/posts/{id}', status_code=204)
 def delete_post(id: int, postsService: Annotated[PostsService, Depends(PostsService)]):
-    return delete_post(id)
-    
+    return postsService.delete_post(id)
