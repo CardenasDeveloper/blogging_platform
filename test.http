@@ -15,3 +15,13 @@ GET http://127.0.0.1:8000/posts/1 HTTP/1.1
 
 ###
 DELETE http://127.0.0.1:8000/posts/1 HTTP/1.1
+
+###
+PATCH http://127.0.0.1:8000/posts/1 HTTP/1.1
+content-type: application/json
+
+{
+    "title": "My first Blog Post",
+    "content": "This is the content of my first blog post",
+    "category": "Technology"
+}
