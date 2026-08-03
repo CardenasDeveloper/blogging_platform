@@ -48,7 +48,7 @@ class PostsService:
 
     def update_post(self, id: int, update_post_dto: UpdatePostDto):
         post = self.find_one_post(id)
-        post_data = update_post_dto.model_dump()
+        post_data = update_post_dto.model_dump(exclude_none=True)
         post.sqlmodel_update(post_data)
         self.session.add(post)
         self.session.commit()
