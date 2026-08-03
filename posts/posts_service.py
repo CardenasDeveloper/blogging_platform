@@ -1,5 +1,5 @@
 from typing import Annotated
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 from sqlmodel import SQLModel, Session, create_engine, select
 
 from posts.dto.create_post_dto import CreatePostDto
@@ -40,7 +40,10 @@ class PostsService:
         return self.session.exec(select(Post).offset(page * limit).limit(limit)).all()
 
     def find_one_post(self, id: int):
-        return self.session.get(Post, id)
+        post = self.session.get(Post, id)
+        if not post:
+            raise HTTPException(status_code=404, detail=f'The post with ID #{ id } not found')
+        return post
 
     def delete_post(self, id: int):
         post = self.find_one_post(id)
